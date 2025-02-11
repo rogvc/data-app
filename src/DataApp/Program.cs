@@ -20,7 +20,7 @@ public class Program
 
         // Add tasks to pool
         consolidateDataForId(27);
-        for (int id = 0; id <= 10; id++)
+        for (int id = 1; id <= 10; id++)
         {
             consolidateDataForId(id);
         }
