@@ -2,13 +2,35 @@ namespace DataApp.Tests;
 
 public class DataManager_Consolidation
 {
+    #region Mocks
+    private class MockDataFetcher : IDataFetcher
+    {
+        public string FetchData(int dataId)
+        {
+            return dataId switch
+            {
+                2 => "Some data",
+                _ => string.Empty,
+            };
+        }
+    }
+
+    private class MockDataStorage : IDataStorage
+    {
+        public void StoreData(int dataId, string data) { }
+    }
+    #endregion
+
     private readonly DataManager _dataManager;
 
     public DataManager_Consolidation()
     {
         // Initialize a new DataManager for each test
         // See https://xunit.net/docs/shared-context for more information
-        _dataManager = new();
+        _dataManager = new(
+            new MockDataFetcher(),
+            new MockDataStorage()
+        );
     }
 
     [Fact(DisplayName = "Invalid Data ID Request")]

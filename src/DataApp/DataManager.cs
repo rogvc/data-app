@@ -1,16 +1,17 @@
 ﻿namespace DataApp;
 
-public class DataManager
+/// <summary>
+/// Defines possible result codes for IDataManager method calls.
+/// </summary>
+public enum DataManagerResult
 {
-    private readonly DataFetcher _dataFetcher;
-    private readonly DataStorage _dataStorage;
+    InvalidDataID = -1,
+    EmptyDataID = -2,
+    Success = 0
+}
 
-    public DataManager()
-    {
-        _dataFetcher = new DataFetcher();
-        _dataStorage = new DataStorage();
-    }
-
+public interface IDataManager
+{
     /// <summary>
     /// Consolidate the data from the DataFetcher sources into a centralized data store.
     /// </summary>
@@ -21,6 +22,11 @@ public class DataManager
     /// <item><description>  0 if we successfully consolidated </description></item>
     /// </list>
     /// </returns>
+    Task<int> ConsolidateDataFromSourcesAsync(int dataId);
+}
+
+public class DataManager(IDataFetcher dataFetcher, IDataStorage dataStorage) : IDataManager
+{
     public async Task<int> ConsolidateDataFromSourcesAsync(int dataId)
     {
         // Check for invalid data ID
@@ -30,24 +36,14 @@ public class DataManager
         }
 
         // Fetch data and check for emptiness
-        var data = await Task.Run(() => _dataFetcher.FetchData(dataId));
+        var data = await Task.Run(() => dataFetcher.FetchData(dataId));
         if (string.IsNullOrWhiteSpace(data))
         {
             return (int)DataManagerResult.EmptyDataID;
         }
 
         // Store the data if not empty
-        await Task.Run(() => _dataStorage.StoreData(dataId, data));
+        await Task.Run(() => dataStorage.StoreData(dataId, data));
         return (int)DataManagerResult.Success;
     }
-}
-
-/// <summary>
-/// Defines possible result codes for the DataManager method calls.
-/// </summary>
-public enum DataManagerResult
-{
-    InvalidDataID = -1,
-    EmptyDataID = -2,
-    Success = 0
 }

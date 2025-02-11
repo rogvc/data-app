@@ -4,17 +4,18 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
-        var manager = new DataManager();
+        var manager = new DataManager(
+            new DataFetcher(),
+            new DataStorage()
+        );
         var tasks = new List<Task>();
 
         // Helper method to consolidate data for a given ID
         void consolidateDataForId(int id)
         {
             tasks.Add(Task.Run(async () =>
-            {
-                var result = await manager.ConsolidateDataFromSourcesAsync(id);
-                Console.WriteLine($"Consolidated data ID {id}. Result: {result}");
-            }));
+                Console.WriteLine($"Consolidated dataID {id}. Result: {await manager.ConsolidateDataFromSourcesAsync(id)}")
+            ));
         }
 
         // Add tasks to pool
